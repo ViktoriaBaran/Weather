@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Montserrat', sans-serif;
+        }
+        
+        .wrap {
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            background: linear-gradient(rgba(74, 132, 251, 1), rgba(57, 184, 133, 1));
+        }
+        
+        .card_wrap {
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: 1s;
+        }
+        
+        .card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            width: 400px;
+            height: 500px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            transition: 1s;
+            position: relative;
+        }
+        
+        .icon {
+            width: 200px;
+            height: 200px;
+            background-image: url(07-Weather.png);
+            background-size: cover;
+        }
+        
+        .cityField {
+            width: 250px;
+            height: 50px;
+            background-color: transparent;
+            border: none;
+            outline: none;
+            font-size: 20px;
+            z-index: 2;
+            color: rgba(255, 255, 255, 0.6);
+            border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .inp {
+            display: flex;
+            width: 250px;
+            height: 50px;
+            flex-direction: column-reverse;
+        }
+        
+        .inp label {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 10px;
+        }
+        
+        .check {
+            width: 150px;
+            height: 50px;
+            background-color: rgb(234, 235, 205);
+            border: none;
+            border-radius: 50px;
+            margin-top: 100px;
+            cursor: pointer;
+            font-weight: 300;
+        }
+        
+        .flag {
+            width: 40px;
+            height: 40px;
+            border-radius: 5px;
+            background-size: cover;
+            margin-left: 5px;
+        }
+        
+        .locInfo {
+            width: 500px;
+            height: 50px;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding-bottom: 3px;
+        }
+        
+        .weatherMainElement {
+            border-bottom: 2px solid rgba(255, 255, 255, 0.722);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            width: 500px;
+            height: 80px;
+        }
+        
+        .weatherData {
+            width: 50%;
+            height: 100vh;
+            display: none;
+            justify-content: center;
+            flex-direction: column;
+            align-items: center;
+            margin-left: 60px;
+        }
+        
+        .contInfo {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-left: 30px;
+        }
+        
+        .tm {
+            width: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+        
+        .weatherIcon {
+            width: 70px;
+            height: 70px;
+            background-size: cover;
+        }
+        
+        .windDirection {
+            width: 40px;
+            height: 40px;
+            background-color: #fff;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.6);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding-bottom: 5px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="wrap" id="wrap">
+
+        <div class="weatherData" id="weatherData">
+            <div class="locInfo" id="locInfo">
+                <h1 id="cit"></h1>
+                <div class="contInfo">
+                    <h1 id="countryName"></h1>
+                    <div class="flag" id="flag"></div>
+                </div>
+            </div>
+
+            <div class="temp weatherMainElement" id="temp">
+                <div class="tempLeft tm" id="tempLeft">
+                    <h5>Actual:</h5>
+                    <h1 id="realTemp"></h1>
+                </div>
+
+                <div class="tempRight tm" id="tempRight">
+                    <h5>Feels like:</h5>
+                    <h1 id="feelsLikeTemp"></h1>
+                </div>
+            </div>
+
+            <div class="weatherMainElement wth">
+                <div class="weatherIcon" id="weatherIcon"></div>
+                <h1 id="weatherQuality"></h1>
+            </div>
+
+            <div class="weatherMainElement" id="windInfo">
+                <div class="windDirection" id="windDirection">
+                    <h1 id="windArrow">→</h1>
+                </div>
+                <h1 id="windSpeed"></h1>
+            </div>
+        </div>
+
+        <div class="card_wrap" id="card_wrap">
+            <div class="card" id="card">
+                <div class="icon" id="icon"></div>
+                <div class="inp">
+                    <input type="text" id="cityField" class="cityField">
+                    <label for="" id="place">Введіть місто</label>
+                </div>
+                <button id="check" class="check">Подивитись погоду</button>
+                <div class="res" id="res"></div>
+            </div>
+        </div>
+    </div>
+
+
+
+    <script>
+        const key = 'dac087457f7e8d45343e1be4cf285df2';
+
+
+        check.onclick = function() {
+            let city = cityField.value;
+
+            fetch('https://api.openweathermap.org/data/2.5/weather?q=' + city + '&appid=' + key)
+                .then((response) => {
+                    console.log('response', response);
+                    console.log('response json', response.json);
+                    return response.json();
+                })
+                .then((data) => {
+                    let t = (data.main.temp - 273).toFixed(2) + 'C';
+                    let ft = (data.main.feels_like - 273).toFixed(2) + 'C';
+                    let cityName = data.name;
+                    let countryCode = data.sys.country;
+
+                    weatherData.style.display = 'flex';
+                    realTemp.innerText = t;
+                    feelsLikeTemp.innerText = ft;
+                    cit.innerText = cityName;
+                    countryName.innerText = countryCode;
+
+                    let flagImage = 'url(https://www.countryflagicons.com/SHINY/64/' + data.sys.country + '.png)';
+                    console.log('flagImage', flagImage);
+                    flag.style.backgroundImage = 'url(https://www.countryflagicons.com/SHINY/64/' + data.sys.country + '.png)';
+
+                    let weatherImage = 'url(https://openweathermap.org/img/wn/' + data.weather[0].icon + '@2x.png)';
+                    console.log('weatherImage', weatherImage);
+                    weatherIcon.style.backgroundImage = 'url(https://openweathermap.org/img/wn/' + data.weather[0].icon + '@2x.png)';
+
+                    weatherQuality.innerText = data.weather[0].description[0].toUpperCase() + data.weather[0].description.slice(1);
+
+
+                    if (data.wind.deg === 0 && data.wind.speed === 0) {
+                        windSpeed.innerText = 'Windless';
+                        windDirection.style.display = 'none';
+                    } else {
+                        windDirection.style.display = 'flex';
+                        windDirection.style.transform = 'rotate(' + data.wind.deg + 'deg)';
+                        windSpeed.innerText = 'Wind speed: ' + data.wind.speed + ' m/s';
+                    }
+
+
+                    setTimeout(function() {
+                        if (data.main.temp - 273 <= 0) {
+                            wrap.style.background = 'linear-gradient(52deg, rgba(163,156,156,1) 8%, rgba(44,184,185,1) 61%, rgba(0,233,255,1) 100%)';
+
+                        } else if (data.main.temp - 273 > 0 && data.main.temp - 273 <= 15) {
+                            wrap.style.background = 'linear-gradient(50deg, rgba(251,201,201,1) 0%, rgba(11,138,232,1) 100%)';
+
+                        } else if (data.main.temp - 273 > 15 && data.main.temp - 273 <= 29) {
+                            wrap.style.background = 'linear-gradient(231deg, rgba(255,226,78,1) 9%, rgba(219,52,16,1) 79%)';
+
+                        } else {
+                            wrap.style.background = 'linear-gradient(231deg, rgba(255,0,0,1) 0%, rgba(255,149,0,1) 67%)';
+
+                        }
+                    })
+
+
+                    console.log('cityName', cityName);
+                    console.log('t', t);
+                    console.log('ft', ft);
+                    console.log('Weather data', data);
+                });
+        }
+    </script>
+</body>
+
+</html>
